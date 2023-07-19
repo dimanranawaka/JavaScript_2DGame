@@ -5,12 +5,13 @@ window.addEventListener('load',function (){
     // canvas setup
     const canvas = document.getElementById('canvas1');
 
-    const ctx = canvas.getContext();
+    const ctx = canvas.getContext('2d');
 
      /*a built-in object that contains all methods and properties that allows to draw and animate colors,shapes
      and other graphics on HTML Canvas*/
 
-
+    canvas.width = 1500;
+    canvas.height = 500;
 
 
 })
