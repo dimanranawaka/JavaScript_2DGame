@@ -30,6 +30,44 @@ window.addEventListener('load',function (){
 
     class Player {
         // This class will control the main character
+
+        constructor(game) {
+
+            /* Objects in JavaScript are so-called reference data types , which means that unlike primitive data types,
+               they are dynamic in nature.
+
+               I'm just creating a reference that is pointing to the place in memory that stores the main game object.
+               So, When the values and properties on te main game object get update, those changes will be immediately
+               visible from this game reference inside this player class.
+
+             */
+
+            //Convert that game object into Player class property using "this" keyword
+
+            this.game = game;
+            this.width = 120; // Player Width
+            this.height = 190; // Player height
+
+            this.x = 20; // Player horizontal position
+            this.y = 100; // Player vertical position
+
+            this.speedY = 0; // Player vertical speed
+        }
+        update(){
+
+            // This method will update player movements
+
+            this.y += this.speedY; // This will increase vertical y position on the player by speed
+
+        }
+
+        /* This "draw(context)" will specify which canvas element we want to draw , cause will multiple layers  */
+        draw(context){
+            // This method will draw graphics representing the player
+
+            /* This context.fillRect will draw simple rectangle by using given info */
+            context.fillRect(this.x, this.y, this.width, this.height)
+        }
     }
 
     class Enemy {
@@ -50,6 +88,35 @@ window.addEventListener('load',function (){
 
     class Game {
         // This class will be the Brain of the entire Project
+
+        /* providing width and height of canvas as arguments to constructor */
+        constructor(width,height) {
+
+            /* This will make sure width and height of the game matches size of the canvas element */
+
+            this.width = width; //Convert them in to class properties
+            this.height = height; // Convert them in to class properties
+
+            /* Reason that I'm doing this one that When I instantiate the game class , I want it to automatically create
+               instance of player class.
+
+               The new keyword is a special command in JavaScript. It will look for class "Player" name  it will run
+               Its constructor to create one instance of it based on the blueprint inside.
+             */
+            this.player = new Player(this); // "this" keyword refers to this entire game object
+
+        }
+        update(){
+            this.player.update(); // This will call the update method of Player Class
+        }
+
+        draw(context){
+            this.player.draw(context); // This will call the draw method of Player Class
+        }
     }
+
+    /* Creating and saving instance of a game class stores in variable.This new keyword triggers Game class Constructor*/
+
+    const game = new Game(canvas.width , canvas.height);
 });
 
