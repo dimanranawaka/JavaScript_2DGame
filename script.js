@@ -17,7 +17,72 @@ window.addEventListener('load',function (){
     Syntactical Sugar to mimics classes Like Java Classes */
 
     class InputHandler {
+
         // This class will keep track of specified user inputs
+        constructor(game) {
+
+            /** Taking game as an argument convert it into InputHandler class property */
+
+            this.game=game;
+
+            /** When we create an instance of class, all the code inside class constructor gets executed . Taking that
+            advantage Apply eventListeners from here */
+
+            /** A special feature of arrow function is that "this" keyword inside arrow functions always represents the
+            object which the arrow function is defined.  */
+
+            window.addEventListener('keydown',e => {
+
+                /** Callback function of eventListener has an auto generated argument that contains all kinds of additional
+                details about the event that just happened.
+
+                Whatever we put here(* as keyboardEvent) will become a custom variable name containing a special object
+                with additional information about the key down event tha just happened.
+
+                I will save it in a variable I call "e" and console.log it
+
+                 */
+
+                if ((e.key === 'ArrowUp') && this.game.keys.indexOf(e.key) === -1){
+
+                    this.game.keys.push(e.key); // Pushing that "key"(the pressing key) into an Array
+
+                }
+
+                // Calling a specific property called key
+
+                console.log(this.game.keys); // This will console.log if "ArrowUp" key correctly added
+
+
+            });
+
+            window.addEventListener('keyup', e=>{
+
+                /** When we release the key, I want to remove it from the array. I do that by checking if the array
+                contains that key.  */
+
+                /** The .indexOf() method returns the first index at which a given element can be found in the array,Or
+                it returns -1 if the element is not present.   */
+
+                if (this.game.keys.indexOf(e.key) > -1){
+
+                    this.game.keys.splice(this.game.keys.indexOf(e.key) ,1);
+
+                    /** The .splice() method changes the contents of an array by removing or replacing existing elements.
+                    This method needs at least two arguments.
+
+                        1. The index at which we want to start changing the array(So it will be that key that we want
+                     to remove )
+
+                        2. Delete Count (An integer indicating the number of elements in the array we want to remove
+                     from that starting index )
+
+                      */
+
+                }
+                console.log(this.game.keys); // This will console.log if "ArrowUp" key correctly removed
+            });
+        }
     }
 
     class Projectile {
@@ -104,6 +169,26 @@ window.addEventListener('load',function (){
                Its constructor to create one instance of it based on the blueprint inside.
              */
             this.player = new Player(this); // "this" keyword refers to this entire game object
+
+            /** So as I did with the "player", I want my InputHandler class to be instantiated automatically.
+             So here inside the "Game" class constructor, I create a property. I set it to the "new InputHandler()" and
+             its constructor expects "game" as an argument , So same as I did it with the Player , I pass it this referring
+             to "this" this entire "game" class. So now if I create a "Game" object it will automatically create "Player"
+             object and "InputHandler" object.
+
+             As I call the "new" keyword on-line  135 JavaScript will jump to line 22 and it will run "InputHandler"
+             class constructor, Which will, among other things apply this key "down" eventListener that's console.log
+             that is pressed.
+             */
+
+
+
+            this.input = new InputHandler(this);
+
+            /** Below array's job will be to keep track of all keys that are currently active, that are currently
+            being pressed "down".  */
+
+            this.keys = [];
 
         }
         update(){
