@@ -143,7 +143,7 @@ window.addEventListener('load',function (){
 
             // This will represent the projectile(laser)
 
-            fillRect(this.x, this.y, this.width, this.height);
+            context.fillRect(this.x, this.y, this.width, this.height);
 
 
         }
@@ -204,14 +204,32 @@ window.addEventListener('load',function (){
 
             this.y += this.speedY; // This will increase vertical y position on the player by speed
 
+            /** I will create an array to hold all the currently active projectile objects */
+
+            this.projectiles = [];
+
         }
 
         /** This "draw(context)" will specify which canvas element we want to draw , cause will multiple layers  */
         draw(context){
             // This method will draw graphics representing the player
 
+            context.fillStyle = 'black';
+
             /** This context.fillRect will draw simple rectangle by using given info */
             context.fillRect(this.x, this.y, this.width, this.height)
+        }
+
+        /** Adding projectiles to the Game by creating a special custom method on player class.
+         Player will have two different attack methods. First I will create basic one. Which is "shootTop()" method.
+
+         When "shootTop()" method is triggered it will take "this.projectiles" array(on-line:209) and push new Projectile()
+         inside using the class which is defined on-line:92.
+
+           */
+
+        shootTop(){
+            this.projectiles.push(new Projectile());
         }
     }
 
