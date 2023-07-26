@@ -43,7 +43,11 @@ window.addEventListener('load',function (){
 
                  */
 
-                if ((e.key === 'ArrowUp') && this.game.keys.indexOf(e.key) === -1){
+                if ((   (e.key === 'ArrowUp') ||
+                        (e.key === 'ArrowDown')
+
+
+                ) && this.game.keys.indexOf(e.key) === -1){
 
                     this.game.keys.push(e.key); // Pushing that "key"(the pressing key) into an Array
 
@@ -117,8 +121,27 @@ window.addEventListener('load',function (){
             this.y = 100; // Player vertical position
 
             this.speedY = 0; // Player vertical speed
+
+            /** Instead of hardcoded -1 and +1 , Maybe player speed is dynamic and player can speed up during a power up.
+            For that purpose better to save max speed in variable like below */
+
+            this.maxSpeed = 2;
         }
         update(){
+
+            /** The .includes() method determines whether an array includes a certain value among its entries, returning
+            true or false as appropriate.   */
+
+            // If this line returns "true", Player will move to Up
+            if(this.game.keys.includes('ArrowUp')) this.speedY = -this.maxSpeed;
+
+            // If this line returns "true", Player will move to Down
+
+            else if (this.game.keys.includes('ArrowDown')) this.speedY = this.maxSpeed;
+
+            // This will make sure Player will stop moving when no keys pressed
+
+            else this.speedY = 0;
 
             // This method will update player movements
 
