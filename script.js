@@ -51,11 +51,17 @@ window.addEventListener('load',function (){
 
                     this.game.keys.push(e.key); // Pushing that "key"(the pressing key) into an Array
 
+                }else if (e.key === ' '){
+
+                    // This will make sure when the user pressed "SpaceBar" calls the "shootTop()" method
+
+                    this.game.player.shootTop();
+
                 }
 
                 // Calling a specific property called key
 
-                console.log(this.game.keys); // This will console.log if "ArrowUp" key correctly added
+                /*console.log(this.game.keys); // This will console.log if "ArrowUp" key correctly added*/
 
 
             });
@@ -84,7 +90,7 @@ window.addEventListener('load',function (){
                       */
 
                 }
-                console.log(this.game.keys); // This will console.log if "ArrowUp" key correctly removed
+                // console.log(this.game.keys); // This will console.log if "ArrowUp" key correctly removed
             });
         }
     }
@@ -183,6 +189,10 @@ window.addEventListener('load',function (){
             For that purpose better to save max speed in variable like below */
 
             this.maxSpeed = 2;
+
+            /** I will create an array to hold all the currently active projectile objects */
+
+            this.projectiles = [];
         }
         update(){
 
@@ -204,10 +214,28 @@ window.addEventListener('load',function (){
 
             this.y += this.speedY; // This will increase vertical y position on the player by speed
 
-            /** I will create an array to hold all the currently active projectile objects */
+            /** Handles Projectiles
 
-            this.projectiles = [];
+                I take  "this.projectiles" array and forEach element in that array I call update method which was
+             defined on-line : 131.
 
+             I want to remove those elements from projectiles array and I will do it using JavaScript filter method.
+
+             The .filter() - method creates a new array with all element that pass the test implemented by the provided
+             function.
+
+             So, here I'm taking projectiles array I call filter on it and the test is that I want all elements to
+             have "markedForDeletion()" set to false.
+
+              */
+
+            this.projectiles.forEach(projectile =>{
+                projectile.update();
+            });
+
+            //This will filter out and remove all elements with "markedForDeletion" Properties set to true.
+
+            this.projectiles = this.projectiles.filter(projectile => !projectile.markedForDeletion);
         }
 
         /** This "draw(context)" will specify which canvas element we want to draw , cause will multiple layers  */
@@ -217,7 +245,15 @@ window.addEventListener('load',function (){
             context.fillStyle = 'black';
 
             /** This context.fillRect will draw simple rectangle by using given info */
-            context.fillRect(this.x, this.y, this.width, this.height)
+            context.fillRect(this.x, this.y, this.width, this.height);
+
+            /** I will also call "forEach()" on all projectiles from inside the "draw()" method and triggers "draw()"
+             method from line:146 on each one */
+
+            this.projectiles.forEach(projectile =>{
+                projectile.draw(context);
+            });
+
         }
 
         /** Adding projectiles to the Game by creating a special custom method on player class.
@@ -229,7 +265,11 @@ window.addEventListener('load',function (){
            */
 
         shootTop(){
-            this.projectiles.push(new Projectile());
+            this.projectiles.push(new Projectile(this.game , this.x, this.y));
+
+            // This is for checking the method on-line:238
+
+            console.log(this.projectiles);
         }
     }
 
