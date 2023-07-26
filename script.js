@@ -91,6 +91,63 @@ window.addEventListener('load',function (){
 
     class Projectile {
         // This class will handle player lasers
+
+        /** Constructor will need three arguments
+
+         1.The main "game" object so that this class has access to game properties when it needs them
+
+         2. Starting x and y coordinates - those needs to be dynamic passed as arguments from here because
+         starting coordinates of each projectile will depend on player's current position
+
+         */
+
+        constructor(game,x,y) {
+
+            this.game = game;
+
+            this.x = x;
+
+            this.y = y;
+
+            this.width = 10;
+
+            this.height = 3;
+
+            this.speed = 3;
+
+            /** Will also need "markedForDeletion" property which will be initially set to false */
+
+            this.markedForDeletion = false;
+        }
+
+        /** "update()" method will increase horizontal x coordinate from line 108 by speed from line 116 */
+
+        update(){
+
+            this.x += this.speed;
+
+            /** Horizontal x coordinate of this projectile object is more than width of the game
+             meaning it has move across the game area and this projectile object can be deleted  */
+
+            // Make sure "Player" lasers have limited range
+
+            if(this.x > this.game.width * 0.8) this.markedForDeletion = true;
+
+        }
+
+        /** Will also need a simple draw method that will take context as an argument */
+
+        draw(context){
+
+            context.fillStyle = 'red';
+
+            // This will represent the projectile(laser)
+
+            fillRect(this.x, this.y, this.width, this.height);
+
+
+        }
+
     }
 
     class Particle {
