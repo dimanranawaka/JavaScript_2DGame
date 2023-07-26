@@ -265,11 +265,17 @@ window.addEventListener('load',function (){
            */
 
         shootTop(){
-            this.projectiles.push(new Projectile(this.game , this.x, this.y));
+            if (this.game.ammo >0 ){
 
-            // This is for checking the method on-line:238
+                this.projectiles.push(new Projectile(this.game , this.x+80, this.y));
 
-            console.log(this.projectiles);
+                /*// This is for checking the method on-line:238
+
+                console.log(this.projectiles);*/
+
+                this.game.ammo--; // This will reduce the ammo of that the player has when he used 'em each time
+
+            }
         }
     }
 
@@ -327,6 +333,10 @@ window.addEventListener('load',function (){
             being pressed "down".  */
 
             this.keys = [];
+
+            /** I want to player has limited ammo */
+
+            this.ammo = 30;
 
         }
         update(){
