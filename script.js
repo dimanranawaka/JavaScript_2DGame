@@ -338,9 +338,56 @@ window.addEventListener('load',function (){
 
             this.ammo = 30;
 
+            /** To trigger periodic event in our game I need two helper variables.
+
+                1. One will be timer that go between zero and some kind of predefined limit,
+                Each time it reaches that limit, It will trigger some kind of event and ot will reset back to zero to
+                count again for the next loop.
+
+                2. Second helper variable will be that limit , interval value that timer needs reach.
+
+             I will also introduce some hard limit. Because I want the ammo to automatically refill only to some value,
+             not endlessly.
+
+              */
+
+            this.maxAmmo = 60; // Mentioned hard limit (line:349)
+
+            this.ammoTimer = 0; // 1st helper variable
+
+            this.ammoInterval = 500; // 2nd helper variable
+
+
         }
-        update(){
+        update(deltaTime){
             this.player.update(); // This will call the update method of Player Class
+
+            /**
+
+             Inside "update()" method of Game class I will use "ammoTimer" and "ammoInterval" helper variables
+             and also "deltaTime" trigger the periodic event that refill ammo every 500ms.
+
+             I say if "this.ammoTimer" more than(>) "this.ammoInterval" and inside of it I will also check if "this.ammo" is
+             less than(<) only then I will increase "this.ammo" by one(++).
+
+                Then I reset "this.ammoTimer = 0", So that it can count again.
+
+             else - keep increasing "this.ammoTimer" by "deltaTime".
+
+             Lastly, I will pass the calculated "deltaTime"(on-line:431) into "update()" method on Game class(on-line:362).
+             The reason of doing that passing to make sure "update()" method expects that value on-line:362 and that "deltaTime"
+             value will get passed along on-line:389.
+               */
+
+            if(this.ammoTimer > this.ammoInterval){
+
+                if(this.ammo < this.maxAmmo) this.ammo++;
+
+                this.ammoTimer = 0;
+
+            }else{
+                this.ammoTimer += deltaTime;
+            }
         }
 
         draw(context){
@@ -352,10 +399,40 @@ window.addEventListener('load',function (){
 
     const game = new Game(canvas.width , canvas.height);
 
+    /** When we use all 30 projectiles, We completely run out of ammo. I want it slowly recharge it over time.
+     To do that, I wanted to run a periodic event in our code base, and I want to be able to measure time in milliseconds
+     and say, for example , every 500ms automatically recharge one ammo.
+
+     To do that , I have created a variable called "lastTime" on-line: 362 and its job will be to store value of time stamp
+     from the previous animation loop. So that we can compare it against the value of timestamp from this animation loop.
+
+     This difference will give us deltaTime ,
+
+     deltaTime - is the difference in ms between the timestamp from this loop and the timestamp from the previous loop.
+
+     Where is this timeStamp comes from?
+
+        "requestAnimationFrame()" - has a special feature. It automatically passes a timeStamp as an argument to the function
+        calls. In our case , animate I can use it simply by giving it a variable name here(line:373).
+
+     So, On-Line: 382 we calculated "deltaTime" , As it is we know how many milliseconds it takes for our computer to render
+     animation frame to run one animation loop.
+
+     Then, I will pass it to "update()" method (On-Line : 391) and  we can use that value to run periodic events in our
+     game or to measure game time.
+
+       */
+
+    let lastTime = 0;
+
     // Animation Loop - Thi Animation loop tha will run, Update and draw methods over and over 60 times per Second
 
     /** Creating a custom function called animate() */
-    function animate() {
+    function animate(timeStamp) {
+
+        const deltaTime = timeStamp - lastTime;
+
+        /*console.log(deltaTime);*/
 
         ctx.clearRect(0,0, canvas.width ,canvas.height); // This will fix that by deleting all kind of drawing between each animation frame
 
@@ -379,6 +456,6 @@ window.addEventListener('load',function (){
          */
 
     }
-    animate();
+    animate(0);
 });
 
