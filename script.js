@@ -336,7 +336,7 @@ window.addEventListener('load',function (){
 
             /** I want to player has limited ammo */
 
-            this.ammo = 30;
+            this.ammo = 20;
 
             /** To trigger periodic event in our game I need two helper variables.
 
@@ -351,7 +351,7 @@ window.addEventListener('load',function (){
 
               */
 
-            this.maxAmmo = 60; // Mentioned hard limit (line:349)
+            this.maxAmmo = 50; // Mentioned hard limit (line:349)
 
             this.ammoTimer = 0; // 1st helper variable
 
@@ -436,7 +436,7 @@ window.addEventListener('load',function (){
 
         ctx.clearRect(0,0, canvas.width ,canvas.height); // This will fix that by deleting all kind of drawing between each animation frame
 
-        game.update(); /** Taking the instance of game class - Associated update method */
+        game.update(deltaTime); /** Taking the instance of game class - Associated update method */
 
         game.draw(ctx); /** This means "ctx" variable will be passed here,and it will get passed along to draw method on
          player object of Game class - Caused now the player know where want to draw it  */
