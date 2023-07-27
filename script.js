@@ -293,6 +293,19 @@ window.addEventListener('load',function (){
 
     class UI {
         // This class will draw score , timer and other information that needs to be displayed for the user
+        constructor(game) {
+            this.game = game;
+            this.fontSize = 25;
+            this.fontFamily = 'Helvetica';
+            this.color = 'white';
+        }
+
+        draw(context){
+            context.fillStyle = this.color;
+            for (let i = 0; i < this.game.ammo; i++) {
+                context.fillRect(20+6 * i,50,3,20);
+            }
+        }
     }
 
     class Game {
@@ -357,6 +370,8 @@ window.addEventListener('load',function (){
 
             this.ammoInterval = 500; // 2nd helper variable
 
+            this.ui = new UI(this);
+
 
         }
         update(deltaTime){
@@ -392,6 +407,7 @@ window.addEventListener('load',function (){
 
         draw(context){
             this.player.draw(context); // This will call the draw method of Player Class
+            this.ui.draw(context);
         }
     }
 
