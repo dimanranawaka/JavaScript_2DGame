@@ -313,6 +313,10 @@ window.addEventListener('load',function (){
             this.speedX = Math.random() * -1.5 - 0.5;
 
             this.markedForDeletion = false;
+
+            this.lives = 5;
+
+            this.score = this.lives;
         }
 
         update(){
@@ -325,7 +329,14 @@ window.addEventListener('load',function (){
 
             context.fillStyle = 'red';
 
-            context.fillRect(this.x , this.y , this.width, this.height );
+            context.fillRect(this.x , this.y+2 , this.width+5, this.height+5 );
+
+
+            context.fillStyle = 'black'
+
+            context.font = '20px Helvetica';
+
+            context.fillText(this.lives, this.x + 10, this.y + 30);
 
         }
     }
@@ -500,6 +511,60 @@ window.addEventListener('load',function (){
             this.enemies.forEach(enemy =>{
 
                 enemy.update();
+
+                /**
+                  Check Collision rest
+                 ________________________
+
+                 As we go through that array one enemy at a time we will check collision between "player" object and that
+                 particular enemy rectangle. I do this by calling our custom "checkCollision" method we wrote and I will
+                 pass  it player as a rectangle 1(rect1) and enemy as rectangle 2(rect2).
+
+                 If this method returns true , we know we are colliding and I will set "markedForDeletion()" on that
+                 animator true.
+
+                 In the same "forEach()" method I will also check each enemy against all currently active projectiles.
+                 They are stored inside "this.player.projectiles" and I call "forEach" on that array as well.
+
+                 "this.player.projectiles.forEach(projectile =>" - We check against every single projectile in projectiles
+                 array.
+
+                 I say if "this.checkCollision" from this "this.player.projectiles.forEach(projectile =>)" iteration,
+                 and enemy from this "this.enemies.forEach(enemy =>)" iteration.
+
+                 "if(this.checkCollision(projectile , enemy))" - true , decrease enemy lives by one.(enemy.lives--;)
+
+                 At the sametime "markedForDeletion" for on that projectile that collided to true.So it get deleted.
+
+                 Then I check if enemy lives are less or equal to zero, set "markedForDeletion" on that enemy to true.
+
+                 And lastly, I will increase the score by each enemy amount.
+
+                  */
+
+                if (this.checkCollision(this.player, enemy)){
+
+                    enemy.markedForDeletion = true;
+                }
+
+                this.player.projectiles.forEach(projectile =>{
+
+                    if(this.checkCollision(projectile , enemy)){
+
+                        enemy.lives--;
+
+                        projectile.markedForDeletion = true;
+
+                        if (enemy.lives <=0){
+
+                            enemy.markedForDeletion = true;
+
+                            this.score += enemy.score;
+                        }
+                    }
+                })
+
+
             });
 
             this.enemies = this.enemies.filter( enemy => !enemy.markedForDeletion); // For deletion of enemies
@@ -535,12 +600,57 @@ window.addEventListener('load',function (){
          I want two helper variables.
 
                 1. "this.enemyTimer" - a timer that will count between zero and an Interval.
-                2. "this.enemyInterval" - want to add new enemy into the game every second
+                2. "this.enemyInterval" - want to add new enemy into the game every second.
 
          * */
         addEnemy(){
             this.enemies.push(new Angler1(this));
         }
+
+        /** I need check if enemies collide with player and also if projectiles collide with enemies to save from code
+            repetition I will create a reusable collision detection method on the main "Game" object.
+
+         "checkCollision()" method - This will take 02 arguments to objects. I will call them "rect1" , "rect2" and it will
+         true if they collide . false for if the don't.
+
+         It will be a reusable function, So we can use it later and pass it player and enemy as "rect1" and "rect2".
+         And we can also pass it enemy and projectile to check if they collide.
+
+         How this works
+         ==============
+
+         When checking if two rectangles collide, we compare their x,y width and height in a specific way. So all objects
+         we are comparing need to have x,y width and height properties.
+
+         To check if two rectangle collide we need to run four checks.
+
+        1. We need to check if horizontal x position of rectangle 1 is less than horizontal x position of rectangle 2 +
+         rectangle2 width (rect1.x < rect2.x + rect2.width)
+
+        2. horizontal x position of rectangle 1 + rectangle1 width greater than horizontal x position of rectangle 2
+         (rect1.x + rect1.width > rect2.x)
+
+        3. vertical y position of rectangle 1 is  less than vertical y position of rectangle 2 + rectangle2 height
+         (rect1.y < rect2.y + rect2.height)
+
+        4. vertical y position of rectangle 1 + rectangle1 height is greater than vertical y position of rectangle2
+         (rect1.y + rect1.height > rect2.y)
+
+         Now we need to implement rest in the "update()" method of "Game" class.
+         */
+
+        checkCollision(rect1 , rect2){
+            return(
+
+                rect1.x < rect2.x + rect2.width &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.height > rect2.y
+
+            )
+        }
+
+
     }
 
     /** Creating and saving instance of a game class stores in variable.This new keyword triggers Game class Constructor*/
