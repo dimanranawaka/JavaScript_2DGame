@@ -281,6 +281,91 @@ window.addEventListener('load',function (){
 
     class Enemy {
         // This class will be the main blueprint handling many different enemy types
+
+        /** Enemy class will contain the main blueprint the properties and methods shared between all enemy types.
+
+         We will then extend this class into multiple small subclasses. Each enemy type will have a separate child that
+         inherits from this main "Enemy" parent class.
+
+         All enemies will need access to the main "Game" object(game). - "this.game = game;"
+
+         All enemies will also have the same start in horizontal x coordinate. - "this.x = this.game.width;"
+         They will go from right to left, starting just behind the right edge of game area.
+
+         Horizontal speed("this.speedX = Math.random()") will be a random number between -1.5 and 0.5 because I want them to
+         move in minus direction to left horizontal X axis.
+
+         "markedForDeletion" will be set to false initially.
+
+         "update()" method will adjust horizontal X coordinate by the amount of speedX value for each animation frame.
+         Moving enemies from right to left eye check if enemy moved completely off-screen all the way behind the left of
+         game area. So if x coordinate of the enemy plus(+) its width is less than zero, we will set its "markedForDeletion"
+         property to true.
+
+         */
+
+        constructor(game) {
+
+            this.game = game;
+
+            this.x = this.game.width;
+
+            this.speedX = Math.random() * -1.5 - 0.5;
+
+            this.markedForDeletion = false;
+        }
+
+        update(){
+            this.x += this.speedX;
+
+            if(this.x + this.width < 0) this.markedForDeletion = true;
+        }
+
+        draw(context){
+
+            context.fillStyle = 'red';
+
+            context.fillRect(this.x , this.y , this.width, this.height );
+
+        }
+    }
+
+    class Angler1 extends Enemy{
+
+        /** Angler1 is the child of parent enemy class, and it has access to its methods such as "update()" and "draw()"
+         as well as other properties. If I call property or a method on angler class and JavaScript can find on angler it will
+         automatically travel to the parent enemy class, and it will look for it there.
+
+         Reason why I used Inheritance here to reduce code repetition.
+
+         * */
+
+        constructor(game) {
+
+            /** This class will have it own constructor because some properties be specific only to  this enemy class only.
+
+             If I don't declare "constructor()" of "Angler1" class at all, It will automatically use "constructor" from
+             the class it Inherits (from line:307).
+
+             If I just declare constructor on "Angler1" it will completely override class constructor and Parent class
+             constructor would be ignored . So I have to use special syntax to kind of merge them.
+
+             I want first to run Parent class "constructor()" and then the others. I do it by calling "super();".
+             Which refers to Parent class "constructor()".
+
+
+             * */
+
+            super(game);
+
+            this.width = 228 * 0.2;
+
+            this.height = 169 * 0.2;
+
+            this.y = Math.random() *(this.game.height * 0.9 - this.height );
+
+        }
+
     }
 
     class Layer {
@@ -364,6 +449,12 @@ window.addEventListener('load',function (){
 
               */
 
+            this.enemies = []; // This will hold active enemy obejects
+
+            this.enemyTimer = 0;
+
+            this.enemyInterval = 1000;
+
             this.maxAmmo = 50; // Mentioned hard limit (line:349)
 
             this.ammoTimer = 0; // 1st helper variable
@@ -371,6 +462,8 @@ window.addEventListener('load',function (){
             this.ammoInterval = 500; // 2nd helper variable
 
             this.ui = new UI(this);
+
+            this.gameOver = false;
 
 
         }
@@ -403,11 +496,50 @@ window.addEventListener('load',function (){
             }else{
                 this.ammoTimer += deltaTime;
             }
+
+            this.enemies.forEach(enemy =>{
+
+                enemy.update();
+            });
+
+            this.enemies = this.enemies.filter( enemy => !enemy.markedForDeletion); // For deletion of enemies
+
+            if(this.enemyTimer > this.enemyInterval && !this.gameOver){
+                this.addEnemy();
+                this.enemyTimer = 0;
+            }else{
+                this.enemyTimer += deltaTime;
+            }
+
         }
 
         draw(context){
             this.player.draw(context); // This will call the draw method of Player Class
             this.ui.draw(context);
+
+            this.enemies.forEach(enemy =>{
+
+                /** I will cycle through all enemies here. And calls their "draw()" and pass the context argument */
+
+                enemy.draw(context);
+
+            });
+        }
+        /** I will add Special method on the "Game" class called "addEnemy()".
+
+         Everytime this method is called , It will push one new enemy object inside enemies array.
+         Instead of calling parent enemy class I'm calling the child "Angler1" here. "Angler1"
+         class expects "game" as an argument I passed it by using "this" keyword.
+
+         Then I want call an enemy in a specific interval. Can use same the technique we to recharge ammo.
+         I want two helper variables.
+
+                1. "this.enemyTimer" - a timer that will count between zero and an Interval.
+                2. "this.enemyInterval" - want to add new enemy into the game every second
+
+         * */
+        addEnemy(){
+            this.enemies.push(new Angler1(this));
         }
     }
 
