@@ -397,10 +397,67 @@ window.addEventListener('load',function (){
         }
 
         draw(context){
+            // Setting font for display score
+
+            /**
+             *
+                If I want the shadows to apply only to the text and not all the shape on canvas I will
+                put it between inbuilt "save()" and "restore()" canvas methods.
+
+                context.save() - method of canvas API saves the entire state of canvas at that point in time.
+                That includes settings like stroke style fill style with global alpha,all shadow settings as well as
+                things like clipping region or the current transformation matrix. Whatever we do with scale , translate
+                and rotate canvas methods, then we can change the state of canvas however we want. And we call restore.
+
+                context.restore() - method restores the most recently saved canvas state.If there is no saved state ,this
+                methods does nothing. So, save and restore only work when used together.
+
+               ** Caution ** - If I did apply shadows outside , "context.save()" and "context.restore()" methods shadows
+                 will get applied everything , including player.
+
+                "context.shadowOffsetX" -  will define the distance that shadow will be offset horizontally.
+
+                "context.shadowOffsetY" -  will define the distance that shadow will be offset vertically.
+
+
+             */
+
+
+            context.save();
+
+            context.shadowOffsetX = 2;
+
+            context.shadowOffsetY = 2;
+
+            context.shadowColor = 'black';
+
+            context.font = this.fontSize + 'px' + this.fontFamily;
+
+            // score
+            /**
+
+             Here I passed the "this.game.score" and coordinates for displaying the score as parameters
+
+               */
+
+            context.fillText('score: '+this.game.score, 20 , 40);
+
+            // ammo
+            /**
+
+             Here I passed the "this.game.score" and coordinates for displaying the score as parameters
+
+             */
+
+            // context.fillText('ammo : '+this.game.ammo,20,60);
+
+
             context.fillStyle = this.color;
             for (let i = 0; i < this.game.ammo; i++) {
                 context.fillRect(20+6 * i,50,3,20);
             }
+
+            context.restore();
         }
     }
 
@@ -475,6 +532,12 @@ window.addEventListener('load',function (){
             this.ui = new UI(this);
 
             this.gameOver = false;
+
+            /** Need to define "this.score" one the main "Game" class here. And also define "this.winningScore" */
+
+            this.score = 0;
+
+            this.winningScore = 10;
 
 
         }
@@ -560,6 +623,13 @@ window.addEventListener('load',function (){
                             enemy.markedForDeletion = true;
 
                             this.score += enemy.score;
+
+                            /**
+                                Every time we increase score here, we check if the current score if more than the
+                                winningScore. If is it true "this.gameOver = true "
+                              */
+
+                            if(this.score > this.winningScore) this.gameOver = true;
                         }
                     }
                 })
