@@ -451,6 +451,11 @@ window.addEventListener('load',function (){
 
             // context.fillText('ammo : '+this.game.ammo,20,60);
 
+            // timer
+
+            const formattedTime = (this.game.gameTime * 0.001).toFixed(1);
+
+            context.fillText('Timer: '+ formattedTime , 20 , 100);
 
             context.fillStyle = this.color;
             for (let i = 0; i < this.game.ammo; i++) {
@@ -581,11 +586,47 @@ window.addEventListener('load',function (){
 
             this.score = 0;
 
-            this.winningScore = 10;
+            this.winningScore = 80;
 
+
+            /**
+                We need a time limit for our Game.
+
+                On the Game Constructor , I create two helper variables.
+
+                this.gameTime - This will 0 ms/s.
+
+                this.TimeLimit - This is for testing purposes.
+
+             * */
+
+            this.gameTime = 0;
+
+            this.timeLimit = 30000;
 
         }
         update(deltaTime){
+
+
+            /**
+
+             In "update()" method I say if (!this.gameOver) = false; take "this.gameTime" and increase it by "deltaTime"
+
+             "deltaTime" - is the difference in milliseconds between timeStamp from this animationLoop and the timeStamp
+             from the previous animationLoop.
+
+             By adding "deltaTime" to the "this.gameTime" every time we draw a new frame , we are keeping track of how
+             many milliseconds passed since the game started.
+
+             "this.gameTime" variable simply just accumulating milliseconds since the game started.
+
+              */
+
+            if(!this.gameOver){this.gameTime += deltaTime;}
+
+            if(this.gameTime > this.timeLimit) {this.gameOver = true;}
+
+
             this.player.update(); // This will call the update method of Player Class
 
             /**
@@ -666,7 +707,13 @@ window.addEventListener('load',function (){
 
                             enemy.markedForDeletion = true;
 
-                            this.score += enemy.score;
+                            if(!this.gameOver){
+
+                                /** This will make if the gameOver Player scoring must stop */
+
+                                this.score += enemy.score;
+
+                            }
 
                             /**
                                 Every time we increase score here, we check if the current score if more than the
@@ -803,6 +850,8 @@ window.addEventListener('load',function (){
     function animate(timeStamp) {
 
         const deltaTime = timeStamp - lastTime;
+
+        lastTime = timeStamp;
 
         /*console.log(deltaTime);*/
 
