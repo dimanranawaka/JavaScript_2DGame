@@ -456,6 +456,50 @@ window.addEventListener('load',function (){
             for (let i = 0; i < this.game.ammo; i++) {
                 context.fillRect(20+6 * i,50,3,20);
             }
+            // Game Over Messages
+
+            /**
+
+             Win and lose condition in our game will depend on how many score points can the player get in a specific
+             time window. We are going handle those Game Over messages here before we call "context.restore()" method.
+             So, "if (this.game.gameOver)=true", we set text align to center.
+
+             We are going to display "message1" large letters. And there will be "message2" in smaller letters.
+
+             These 2 messages say will depend on how may score points we managed to get in a specified game time.
+
+             ***** After that , We need to draw them in the Canvas. ******
+
+               */
+
+            if (this.game.gameOver){
+
+                context.textAlign = 'center';
+
+                let message1;
+                let message2;
+
+                if( this.game.score > this.game.winningScore ){
+
+                    message1 = 'You Won!';
+                    message2 = 'Amazing Player!';
+
+                }else{
+
+                    message1 = 'You Lost!';
+                    message2 = 'Try Again!';
+
+                }
+
+                context.font = '50px' + this.fontFamily;
+
+                context.fillText(message1, this.game.width *0.5, this.game.height * 0.5 -40);
+
+                context.font = '25px' + this.fontFamily;
+
+                context.fillText(message2, this.game.width *0.5, this.game.height * 0.5 +40);
+
+            }
 
             context.restore();
         }
