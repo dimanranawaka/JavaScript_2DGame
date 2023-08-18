@@ -381,10 +381,140 @@ window.addEventListener('load',function (){
 
     class Layer {
         // This class will handle individual background layers
+
+        /** Constructor() will expect 03 arguments. */
+
+        constructor(game,image,speedModifier) {
+
+            this.game = game;
+
+            this.image = image;
+
+            this.speedModifier = speedModifier;
+
+            this.width = 1768;
+
+            this.height = 500;
+
+            this.x = 0;
+
+            this.y = 0;
+        }
+
+        /**
+             We will need method to move the background layers right to left as the game scrolls
+
+            if (this.x <= -this.width ) - meaning the background image has move the across the screen
+            and fully hidden behind left edge of canvas. We set this.x = 0; So, it can scroll again.
+
+            else - decrease x by this.game.speed * this.speedModifier. Cause each layer object will have different
+            speedModifier to create parallax but all will depend on the main game speed variable so that all four
+            layers can be controlled from one place.
+
+         */
+        update(){
+
+            if(this.x <= -this.width ){
+
+                this.x = 0;
+
+            }
+
+            this.x -= this.game.speed;
+
+        }
+
+        /**
+         Layers class will also need a "draw()" method it will take context as argument.
+
+         I call built-in
+
+         "context.drawImage()" - this method need as least three arguments.
+
+                01. Image that we want draw - this.image
+                02. where on the canvas that we want draw it - this.x , this.y
+
+
+
+         * */
+
+        draw(context){
+
+            context.drawImage(this.image,this.x,this.y);
+
+            // For Endless Parallax Background
+
+            context.drawImage(this.image,this.x+this.width,this.y);
+
+        }
+
     }
 
     class Background {
-        // This Class will pull all layers objects together to animate the entire game
+
+        /** We will also need background class that will put all four layers together to create the Game World
+
+            constructor will take the main Game object as argument.
+
+                "this.game = game" - convert it into a class property
+
+                "this.image1 = document.getElementById('layer1')" here , we will grab all four images for each layer with
+                js. And Passed it "layer1".
+
+                "this.layer1 = new Layer( this.game,this.image1, 1 )" - will be an object that holds the instance of
+                "Layer" class from line:382.
+
+                on-line : 387 we can see that "Layer" class expects "game" ,"image" and "speedModifier" arguments.
+                So,We should pass them.
+
+         * */
+
+        constructor(game){
+
+            this.game = game;
+
+            this.image1 = document.getElementById('layer1');
+            this.image2 = document.getElementById('layer2');
+            this.image3 = document.getElementById('layer3');
+            this.image4 = document.getElementById('layer4');
+
+            this.layer1 = new Layer( this.game,this.image1, 1 );
+            this.layer2 = new Layer( this.game,this.image2, 1 );
+            this.layer3 = new Layer( this.game,this.image3, 1 );
+            this.layer4 = new Layer( this.game,this.image4, 1 );
+
+            this.layers = [this.layer1,this.layer2,this.layer2,this.layer3]; // This will hold all layer objects
+        }
+
+        /**
+            "update()" - method will move all the layer objects.
+
+            Inside "update()" method I take "this.layers" and I will call "forEach()" , to each layer object calls
+            their own "update()" method that we declare on-line:415.
+         */
+
+        update(){
+
+            this.layers.forEach(layer => layer.update());
+
+        }
+
+        /**
+
+         "draw()" - method will draw all the layer objects.And it expects "context" as argument
+         to specify which canvas we want to draw.
+
+         inside we will do same thing that we do with the above "update()" method, and each layer object triggers it's
+         "draw()" method and pass the "context" as argument.
+
+         */
+
+        draw(context){
+
+            this.layers.forEach(layer => layer.draw(context));
+
+        }
+
     }
 
     class UI {
@@ -397,6 +527,7 @@ window.addEventListener('load',function (){
         }
 
         draw(context){
+
             // Setting font for display score
 
             /**
@@ -521,6 +652,15 @@ window.addEventListener('load',function (){
             this.width = width; //Convert them in to class properties
             this.height = height; // Convert them in to class properties
 
+            /**
+
+             To animate background , just need to create an instance of "Background" class inside the "Game" class
+             constructor.
+
+             * */
+
+            this.background = new Background(this);
+
             /** Reason that I'm doing this one that When I instantiate the game class , I want it to automatically create
                instance of player class.
 
@@ -566,7 +706,7 @@ window.addEventListener('load',function (){
 
               */
 
-            this.enemies = []; // This will hold active enemy obejects
+            this.enemies = []; // This will hold active enemy objects
 
             this.enemyTimer = 0;
 
@@ -604,6 +744,8 @@ window.addEventListener('load',function (){
 
             this.timeLimit = 30000;
 
+            this.speed = 1; // Game Speed
+
         }
         update(deltaTime){
 
@@ -626,6 +768,11 @@ window.addEventListener('load',function (){
 
             if(this.gameTime > this.timeLimit) {this.gameOver = true;}
 
+            /** Inside this "update()" method we need to call "Background" class update() method */
+
+            this.background.update();
+
+            this.background.layer4.update();
 
             this.player.update(); // This will call the update method of Player Class
 
@@ -740,6 +887,11 @@ window.addEventListener('load',function (){
         }
 
         draw(context){
+
+            /** Inside this "draw()" method we need to call "Background" class "draw()" method */
+
+            this.background.draw(context);
+
             this.player.draw(context); // This will call the draw method of Player Class
             this.ui.draw(context);
 
@@ -750,6 +902,7 @@ window.addEventListener('load',function (){
                 enemy.draw(context);
 
             });
+            this.background.layer4.draw(context);
         }
         /** I will add Special method on the "Game" class called "addEnemy()".
 
