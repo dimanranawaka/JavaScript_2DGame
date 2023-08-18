@@ -24,6 +24,6 @@
 
 /** I don't want to display background images at the whole web page. I just want to display em only in the canvas */
 
-#layer1, #layer2, #layer3, #layer4 {
+#layer1, #layer2, #layer3, #layer4 ,#player{
     display: none;
 }

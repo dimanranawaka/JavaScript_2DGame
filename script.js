@@ -165,8 +165,9 @@ window.addEventListener('load',function (){
 
         constructor(game) {
 
-            /** Objects in JavaScript are so-called reference data types , which means that unlike primitive data types,
-               they are dynamic in nature.
+            /**
+                Objects in JavaScript are so-called reference data types , which means that unlike primitive data types,
+                they are dynamic in nature.
 
                I'm just creating a reference that is pointing to the place in memory that stores the main game object.
                So, When the values and properties on te main game object get update, those changes will be immediately
@@ -183,16 +184,30 @@ window.addEventListener('load',function (){
             this.x = 20; // Player horizontal position
             this.y = 100; // Player vertical position
 
+            /** this.frameX will cycle player sprite-sheet horizontally  */
+
+            this.frameX = 0;
+
+            /** this.frameY will determine row of the sprite-sheet */
+
+            this.frameY = 1;
+
+            this.maxFrame = 37;
+
             this.speedY = 0; // Player vertical speed
 
             /** Instead of hardcoded -1 and +1 , Maybe player speed is dynamic and player can speed up during a power up.
             For that purpose better to save max speed in variable like below */
 
-            this.maxSpeed = 2;
+            this.maxSpeed = 3;
 
             /** I will create an array to hold all the currently active projectile objects */
 
             this.projectiles = [];
+
+            /** Bringing the player image to Player class */
+
+            this.image = document.getElementById('player');
         }
         update(){
 
@@ -236,6 +251,20 @@ window.addEventListener('load',function (){
             //This will filter out and remove all elements with "markedForDeletion" Properties set to true.
 
             this.projectiles = this.projectiles.filter(projectile => !projectile.markedForDeletion);
+
+            /**
+                    Sprite Animation
+
+             */
+            if (this.frameX < this.maxFrame){
+
+                this.frameX++;
+
+            }else {
+
+                this.frameX = 0;
+
+            }
         }
 
         /** This "draw(context)" will specify which canvas element we want to draw , cause will multiple layers  */
@@ -246,6 +275,30 @@ window.addEventListener('load',function (){
 
             /** This context.fillRect will draw simple rectangle by using given info */
             context.fillRect(this.x, this.y, this.width, this.height);
+
+
+            /**
+
+                To draw the sprite-sheet I will use in-built "context.drawImage()" method.
+
+                In here we want some longer version of "context.drawImage()".
+
+                To do that I have to pass 9 arguments to that method.
+                    1. this.image - the player image
+
+                    2. sx - Source X / this.frameX * this.width
+                    3. sy - Source Y / this.frameY * this.height
+                    4. sw - Source Width / width of a single frame
+                    5. sh - Source height / height of a single frame
+
+                    6. this.x - destination x position
+                    7. this.y - destination y position
+                    8. this.width - destination width
+                    9. this.height - destination height
+
+             * */
+
+            context.drawImage(this.image ,this.frameX * this.width,this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
 
             /** I will also call "forEach()" on all projectiles from inside the "draw()" method and triggers "draw()"
              method from line:146 on each one */
